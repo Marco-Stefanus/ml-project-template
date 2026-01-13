@@ -1,26 +1,39 @@
+data = load_data("data/processed/data.csv")
+
 from src.utils.config import load_config
 from src.data.loader import load_data
 from src.models.train import train
+from src.utils.logger import logger
 
-config = load_config("configs/base.yaml")
+def main():
+	try:
+		logger.info("Loading config...")
+		config = load_config("configs/base.yaml")
+	except Exception as e:
+		logger.error(f"Failed to load config: {e}")
+		return
 
-data = load_data("data/processed/data.csv")
+	try:
+		logger.info("Loading data...")
+		data = load_data("data/processed/data.csv")
+	except Exception as e:
+		logger.error(f"Failed to load data: {e}")
+		return
 
-X = data.drop("target", axis=1)
-y = data["target"]
+	try:
+		logger.info("Splitting data...")
+		X = data.drop("target", axis=1)
+		y = data["target"]
+	except Exception as e:
+		logger.error(f"Failed to split data: {e}")
+		return
 
-train(X, y, config)
-print("Loading config...")
-config = load_config("configs/base.yaml")
+	try:
+		logger.info("Training model...")
+		train(X, y, config)
+		logger.success("DONE! Model saved successfully.")
+	except Exception as e:
+		logger.error(f"Model training failed: {e}")
 
-print("Loading data...")
-data = load_data("data/processed/data.csv")
-
-print("Splitting data...")
-X = data.drop("target", axis=1)
-y = data["target"]
-
-print("Training model...")
-train(X, y, config)
-
-print("DONE! Model saved successfully.")
+if __name__ == "__main__":
+	main()
