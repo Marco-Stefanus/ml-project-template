@@ -1,40 +1,20 @@
-data = load_data("data/processed/data.csv")
-
 from src.utils.config import load_config
 from src.data.loader import load_data
-from src.models.train import train
-from src.utils.logger import logger
-from src.pipeline import run 
+from src.data.preprocessor import preprocess
 
-def main():
-	try:
-		logger.info("Loading config...")
-		config = load_config("configs/base.yaml")
-	except Exception as e:
-		logger.error(f"Failed to load config: {e}")
-		return
+def run(config_path):
+    config = load_config(config_path)
 
-	try:
-		logger.info("Loading data...")
-		data = load_data("data/processed/data.csv")
-	except Exception as e:
-		logger.error(f"Failed to load data: {e}")
-		return
+    data = load_data(config["data"]["path"])
+    data = preprocess(data)
 
-	try:
-		logger.info("Splitting data...")
-		X = data.drop("target", axis=1)
-		y = data["target"]
-	except Exception as e:
-		logger.error(f"Failed to split data: {e}")
-		return
+    if config["mode"] == "ml":
+        from src.models.ML.train import train
+        train(data, config)
 
-	try:
-		logger.info("Training model...")
-		train(X, y, config)
-		logger.success("DONE! Model saved successfully.")
-	except Exception as e:
-		logger.error(f"Model training failed: {e}")
+    elif config["mode"] == "dl":
+        from src.models.DL.train import train
+        train(data, config)
 
-if __name__ == "__main__":
-    run()
+    else:
+        raise ValueError("Invalid mode (ml | dl)")

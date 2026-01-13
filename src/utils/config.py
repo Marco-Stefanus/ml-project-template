@@ -1,12 +1,9 @@
 import yaml
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
-def load_config(path):
-    try:
-        with open(path) as f:
-            config = yaml.safe_load(f)
-        logger.info(f"Loaded config from {path}")
-        return config
-    except Exception as e:
-        logger.error(f"Error loading config from {path}: {e}")
-        raise
+logger = get_logger(__name__)
+
+def load_config(path: str) -> dict:
+    logger.info(f"Loading config from {path}")
+    with open(path, "r") as f:
+        return yaml.safe_load(f)

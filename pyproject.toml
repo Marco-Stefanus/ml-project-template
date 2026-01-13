@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml_project_template"
+version = "0.1.0"
+description = "A modular ML project template."
+authors = [
+    { name = "Your Name", email = "your@email.com" }
+]
+dependencies = [
+    "pandas",
+    "scikit-learn",
+    "loguru",
+    "pyyaml",
+    "joblib"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,9 @@
+mode: ml
+
+model:
+  name: logistic_regression
+  params:
+    max_iter: 1000
+
+training:
+  test_size: 0.2
