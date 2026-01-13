@@ -1,0 +1,5 @@
+training:
+  epochs: 50
+
+logging:
+  level: WARNING

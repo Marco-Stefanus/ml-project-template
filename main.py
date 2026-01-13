@@ -4,6 +4,7 @@ from src.utils.config import load_config
 from src.data.loader import load_data
 from src.models.train import train
 from src.utils.logger import logger
+from src.pipeline import run 
 
 def main():
 	try:
@@ -36,4 +37,4 @@ def main():
 		logger.error(f"Model training failed: {e}")
 
 if __name__ == "__main__":
-	main()
+    run()
