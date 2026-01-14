@@ -13,11 +13,11 @@ def run(config_path):
     df = preprocess(df)
 
     if config["mode"] == "ml":
-        from src.models.ml.train import train
+        from src.models.ML.train import train
         train(df, config)
 
     elif config["mode"] == "dl":
-        from src.models.dl.train import train
+        from src.models.DL.train import train
         train(df, config)
 
     else:

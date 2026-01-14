@@ -1,51 +1,52 @@
-import joblib
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+# import joblib
+# from sklearn.model_selection import train_test_split
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.metrics import accuracy_score
 
 
-def train(df, config):
+# def train(df, config):
 
-    print("🚀 Training started...")
+#     print("🚀 Training started...")
 
-    # Split feature & target
-    X = df.drop(columns=[config["data"]["target"]])
-    y = df[config["data"]["target"]]
+#     # Split feature & target
+#     X = df.drop(columns=[config["data"]["target"]])
+#     y = df[config["data"]["target"]]
 
-    # Train test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=config["training"]["test_size"],
-        random_state=42
-    )
+#     # Train test split
+#     X_train, X_test, y_train, y_test = train_test_split(
+#         X,
+#         y,
+#         test_size=config["training"]["test_size"],
+#         random_state=42
+#     )
 
-    print("📊 Data split:")
-    print("Train:", X_train.shape)
-    print("Test :", X_test.shape)
+#     print("📊 Data split:")
+#     print("Train:", X_train.shape)
+#     print("Test :", X_test.shape)
 
-    # Model
-    model = LogisticRegression(**config["model"]["params"])
-    print("🧠 Training model...")
-    model.fit(X_train, y_train)
+#     # Model
+#     model = LogisticRegression(**config["model"]["params"])
+#     print("🧠 Training model...")
+#     model.fit(X_train, y_train)
 
-    # Evaluation
-    y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
+#     # Evaluation
+#     y_pred = model.predict(X_test)
+#     acc = accuracy_score(y_test, y_pred)
 
-    print(f"✅ Training finished | Accuracy: {acc:.4f}")
+#     print(f"✅ Training finished | Accuracy: {acc:.4f}")
 
-    # Save model
-    path = "models/artifacts/model.pkl"
-    joblib.dump(model, path)
-    print(f"💾 Model saved to: {path}")
+#     # Save model
+#     path = "models/artifacts/model.pkl"
+#     joblib.dump(model, path)
+#     print(f"💾 Model saved to: {path}")
 
-    return model
+#     return model
 
 import joblib
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+import subprocess  # cukup import sekali di global
 
 def train(df, config):
     print("🚀 Training started...")
@@ -54,10 +55,9 @@ def train(df, config):
     X = df.drop(columns=[config["data"]["target"]])
     y = df[config["data"]["target"]]
 
-    # Train test split
+    # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
+        X, y,
         test_size=config["training"]["test_size"],
         random_state=42
     )
@@ -66,15 +66,15 @@ def train(df, config):
     print("Train:", X_train.shape)
     print("Test :", X_test.shape)
 
-    # Dataset untuk LightGBM
+    # Dataset LightGBM
     lgb_train = lgb.Dataset(X_train, label=y_train)
     lgb_eval = lgb.Dataset(X_test, label=y_test, reference=lgb_train)
 
+    # Config LightGBM
+    lgb_params = config["model"]["params"].copy()
+    lgb_params["verbose"] = -1
 
-    # Config LightGBM (check GPU availability)
-    import subprocess
-    lgb_params = config["model"]["params"].copy()  # avoid mutating config
-    lgb_params["verbose"] = -1  # suppress logs
+    # GPU fallback
     try:
         subprocess.run(["nvidia-smi"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
         lgb_params["device"] = "gpu"
@@ -96,9 +96,8 @@ def train(df, config):
 
     # Evaluation
     y_pred = model.predict(X_test, num_iteration=model.best_iteration)
-    y_pred_labels = [1 if p > 0.5 else 0 for p in y_pred]  # binary classification
+    y_pred_labels = [1 if p > 0.5 else 0 for p in y_pred]
     acc = accuracy_score(y_test, y_pred_labels)
-
     print(f"✅ Training finished | Accuracy: {acc:.4f}")
 
     # Save model
@@ -107,13 +106,3 @@ def train(df, config):
     print(f"💾 Model saved to: {path}")
 
     return model
-# Cek GPU & fallback
-try:
-    import subprocess
-    # cek nvidia-smi (Windows)
-    subprocess.run(["nvidia-smi"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-    lgb_params["device"] = "gpu"
-    print("✅ GPU detected, training on GPU")
-except Exception:
-    lgb_params["device"] = "cpu"
-    print("⚠ GPU not available, fallback to CPU")
