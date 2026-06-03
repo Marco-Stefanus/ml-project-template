@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Env
+.venv/
+.venv-1/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Models
+models/*.pkl
+models/*.joblib
+models/*.pth
+
+# Logs
+logs/
+
+# Mac
+.DS_Store

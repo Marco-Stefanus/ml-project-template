@@ -1,0 +1,19 @@
+dataset:
+  path: data/processed/framingham.csv
+
+training:
+  test_size: 0.2
+  random_state: 42
+
+models:
+  xgboost:
+    enabled: true
+
+  tabnet:
+    enabled: true
+
+  ebm:
+    enabled: true
+
+  stacking:
+    enabled: true
